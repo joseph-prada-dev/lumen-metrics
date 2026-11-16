@@ -12,8 +12,7 @@ export const site = {
   title: "Lumen Metrics: Know why your numbers moved",
   description:
     "Lumen watches every metric, flags what changed, and explains the cause in plain English, before your Monday meeting does.",
-  // Swap for the production domain once deployed.
-  url: "https://lumen-metrics.vercel.app",
+  url: "https://lumen-metrics-chi.vercel.app",
 } as const;
 
 /* ------------------------------------------------------------------ Nav */

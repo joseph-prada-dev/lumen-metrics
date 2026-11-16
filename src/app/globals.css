@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------- Design tokens */
+@theme inline {
+  --color-bg: #07080b;
+  --color-surface: #0e1016;
+  --color-surface-2: #0b0d12;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+  --color-fg: #edeef2;
+  --color-muted: #8a8f98;
+  --color-violet: #7c5cff;
+  --color-cyan: #22d3ee;
+  --color-success: #34d399;
+  --color-alert: #f59e0b;
+
+  --radius-card: 14px;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+:root {
+  --accent-gradient: linear-gradient(90deg, #7c5cff 0%, #22d3ee 100%);
+  color-scheme: dark;
+}
+
+html {
+  background: #07080b;
+}
+
+body {
+  background: #07080b;
+  color: #edeef2;
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(124, 92, 255, 0.35);
+}
+
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------- Utilities */
+@utility text-gradient {
+  background-image: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* keep descenders (the "y" in "why") inside the clipped box */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+@utility bg-accent {
+  background-image: var(--accent-gradient);
+}
+
+@utility h1-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+/* Elements revealed by GSAP start hidden to avoid a flash of final state.
+   A <noscript> rule in layout.tsx un-hides them when JS is off. */
+.js-reveal {
+  visibility: hidden;
+}
+
+/* ------------------------------------------------------------------ Hero */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 30%, #000 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 30%, #000 25%, transparent 75%);
+}
+
+.hero-glow {
+  position: absolute;
+  left: 50%;
+  border-radius: 9999px;
+  will-change: transform;
+}
+
+.hero-glow--violet {
+  width: 820px;
+  height: 560px;
+  top: -80px;
+  margin-left: -620px;
+  background: radial-gradient(closest-side, rgba(124, 92, 255, 0.42), transparent);
+  animation: glow-drift-a 18s ease-in-out infinite alternate;
+}
+
+.hero-glow--cyan {
+  width: 720px;
+  height: 520px;
+  top: 80px;
+  margin-left: -120px;
+  background: radial-gradient(closest-side, rgba(34, 211, 238, 0.24), transparent);
+  animation: glow-drift-b 22s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift-a {
+  to {
+    transform: translate3d(140px, 60px, 0) scale(1.08);
+  }
+}
+
+@keyframes glow-drift-b {
+  to {
+    transform: translate3d(-160px, -40px, 0) scale(1.12);
+  }
+}
+
+/* Soft outer glow for the dashboard frame (no heavy drop shadows). */
+.dash-frame {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 30px 120px -40px rgba(124, 92, 255, 0.45);
+}
+
+.dash-frame::before {
+  /* thin gradient hairline along the top edge */
+  content: "";
+  position: absolute;
+  inset: 0 15% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124, 92, 255, 0.8), rgba(34, 211, 238, 0.8), transparent);
+}
+
+/* ------------------------------------------------------------ Logo strip */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ---------------------------------------------------------- How it works
+   Pinned story on desktop with motion; stacked steps everywhere else. */
+.hiw-pinned {
+  display: none;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .hiw-pinned {
+    display: block;
+  }
+  .hiw-stacked {
+    display: none;
+  }
+  /* avoid a flash of overlapping steps before GSAP sets initial states */
+  .hiw-pinned [data-step]:not(:first-child) {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------ Spotlight cards */
+.spotlight {
+  position: relative;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s;
+}
+
+.spotlight::before,
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+/* border-only highlight that follows the cursor */
+.spotlight::before {
+  padding: 1px;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(124, 92, 255, 0.9),
+    rgba(34, 211, 238, 0.45) 40%,
+    transparent 70%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* faint inner wash */
+.spotlight::after {
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(124, 92, 255, 0.07), transparent 60%);
+}
+
+@media (hover: hover) {
+  .spotlight:hover {
+    transform: translateY(-4px);
+  }
+  .spotlight:hover::before,
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+}
+
+.type-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.18em;
+  background: #22d3ee;
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------------------------- Pricing */
+.gradient-border-spin {
+  background: conic-gradient(
+    from 0deg,
+    rgba(124, 92, 255, 0.15),
+    #7c5cff 20%,
+    #22d3ee 35%,
+    rgba(34, 211, 238, 0.15) 50%,
+    rgba(124, 92, 255, 0.15) 70%,
+    #7c5cff 90%,
+    rgba(124, 92, 255, 0.15)
+  );
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* ------------------------------------------------------------------ FAQ */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.accordion-panel.is-open {
+  grid-template-rows: 1fr;
+}
+
+.accordion-content {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.3s,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-open .accordion-content {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.08s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow,
+  .gradient-border-spin,
+  .type-caret {
+    animation: none;
+  }
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+  .marquee-track > ul[aria-hidden="true"] {
+    display: none;
+  }
+  .marquee-track > ul {
+    flex-wrap: wrap;
+    flex-shrink: 1;
+    width: 100%;
+    padding: 0 1rem;
+    justify-content: center;
+    column-gap: 2.5rem;
+    row-gap: 1.5rem;
+  }
+  .marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .spotlight,
+  .accordion-panel,
+  .accordion-content {
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
